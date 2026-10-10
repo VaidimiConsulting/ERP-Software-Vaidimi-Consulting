@@ -533,7 +533,7 @@ function BranchesPage() {
                     </label>
                     <input
                       type="email"
-                      placeholder="noida.hub@vaidimi.com"
+                      placeholder="info@vaidimiconsulting.in"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       style={{ width: '100%', padding: '0.65rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}

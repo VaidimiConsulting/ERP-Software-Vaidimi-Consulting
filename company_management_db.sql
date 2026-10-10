@@ -100,7 +100,7 @@ CREATE TABLE `branches` (
 
 LOCK TABLES `branches` WRITE;
 /*!40000 ALTER TABLE `branches` DISABLE KEYS */;
-INSERT INTO `branches` VALUES (1,'BR-VNS','Vaidimi Corporate HQ & Main Office (Varanasi)','Varanasi','Uttar Pradesh','Vaidimi Tech Center, Sigra / Cantt, Varanasi, Uttar Pradesh - 221002','+91 542 2500 123','varanasi.hq@vaidimi.com',9,1,'2026-09-19 11:26:07','2026-09-19 11:45:38'),(2,'BR-NOI','Noida Tech Development Hub','Noida','Uttar Pradesh','Plot 14, Electronic City, Sector 62, Noida','+91 120 4567 890','noida.hub@vaidimi.com',NULL,0,'2026-09-19 11:26:07','2026-09-19 11:43:08'),(3,'BR-LKO','Lucknow Operations Hub','Lucknow','Uttar Pradesh','Vibhuti Khand, Gomti Nagar, Lucknow','+91 522 4567 890','lucknow.hub@vaidimi.com',NULL,1,'2026-09-19 11:26:07','2026-09-19 11:26:07'),(5,'BR-DEL','Delhi Regional Center (Future Expansion)','Delhi NCR','Delhi','Connaught Place, New Delhi','+91 11 4567 8900','delhi.office@vaidimi.com',NULL,1,'2026-09-19 11:45:38','2026-09-19 11:45:38');
+INSERT INTO `branches` VALUES (1,'BR-VNS','Vaidimi Corporate HQ & Main Office (Varanasi)','Varanasi','Uttar Pradesh','Vaidimi Tech Center, Sigra / Cantt, Varanasi, Uttar Pradesh - 221002','+91 542 2500 123','info@vaidimiconsulting.in',9,1,'2026-09-19 11:26:07','2026-09-19 11:45:38'),(2,'BR-NOI','Noida Tech Development Hub','Noida','Uttar Pradesh','Plot 14, Electronic City, Sector 62, Noida','+91 120 4567 890','noida.hub@vaidimi.com',NULL,0,'2026-09-19 11:26:07','2026-09-19 11:43:08'),(3,'BR-LKO','Lucknow Operations Hub','Lucknow','Uttar Pradesh','Vibhuti Khand, Gomti Nagar, Lucknow','+91 522 4567 890','lucknow.hub@vaidimi.com',NULL,1,'2026-09-19 11:26:07','2026-09-19 11:26:07'),(5,'BR-DEL','Delhi Regional Center (Future Expansion)','Delhi NCR','Delhi','Connaught Place, New Delhi','+91 11 4567 8900','delhi.office@vaidimi.com',NULL,1,'2026-09-19 11:45:38','2026-09-19 11:45:38');
 /*!40000 ALTER TABLE `branches` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -127,8 +127,8 @@ CREATE TABLE `chat_conversations` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`),
   KEY `created_by` (`created_by`),
-  CONSTRAINT `chat_conversations_ibfk_75` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chat_conversations_ibfk_76` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `chat_conversations_ibfk_79` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `chat_conversations_ibfk_80` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -162,8 +162,8 @@ CREATE TABLE `chat_messages` (
   PRIMARY KEY (`id`),
   KEY `conversation_id` (`conversation_id`),
   KEY `sender_id` (`sender_id`),
-  CONSTRAINT `chat_messages_ibfk_75` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `chat_messages_ibfk_76` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `chat_messages_ibfk_79` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `chat_messages_ibfk_80` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -195,8 +195,8 @@ CREATE TABLE `chat_participants` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `chat_participants_conversation_id_user_id` (`conversation_id`,`user_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `chat_participants_ibfk_75` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `chat_participants_ibfk_76` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
+  CONSTRAINT `chat_participants_ibfk_79` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `chat_participants_ibfk_80` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -298,7 +298,9 @@ CREATE TABLE `company_settings` (
   UNIQUE KEY `key_36` (`key`),
   UNIQUE KEY `key_37` (`key`),
   UNIQUE KEY `key_38` (`key`),
-  UNIQUE KEY `key_39` (`key`)
+  UNIQUE KEY `key_39` (`key`),
+  UNIQUE KEY `key_40` (`key`),
+  UNIQUE KEY `key_41` (`key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -403,11 +405,11 @@ CREATE TABLE `employees` (
   KEY `reporting_manager_id` (`reporting_manager_id`),
   KEY `mentor_id` (`mentor_id`),
   KEY `branch_id` (`branch_id`),
-  CONSTRAINT `employees_ibfk_757` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `employees_ibfk_758` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `employees_ibfk_759` FOREIGN KEY (`reporting_manager_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `employees_ibfk_760` FOREIGN KEY (`mentor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `employees_ibfk_761` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `employees_ibfk_767` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `employees_ibfk_768` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `employees_ibfk_769` FOREIGN KEY (`reporting_manager_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `employees_ibfk_770` FOREIGN KEY (`mentor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `employees_ibfk_771` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -586,7 +588,9 @@ CREATE TABLE `leave_types` (
   UNIQUE KEY `code_36` (`code`),
   UNIQUE KEY `code_37` (`code`),
   UNIQUE KEY `code_38` (`code`),
-  UNIQUE KEY `code_39` (`code`)
+  UNIQUE KEY `code_39` (`code`),
+  UNIQUE KEY `code_40` (`code`),
+  UNIQUE KEY `code_41` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -705,8 +709,8 @@ CREATE TABLE `project_members` (
   UNIQUE KEY `project_members_employee_id_project_id_unique` (`project_id`,`employee_id`),
   UNIQUE KEY `unique_project_employee_member` (`project_id`,`employee_id`),
   KEY `employee_id` (`employee_id`),
-  CONSTRAINT `project_members_ibfk_347` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `project_members_ibfk_348` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `project_members_ibfk_351` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `project_members_ibfk_352` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -780,8 +784,8 @@ CREATE TABLE `projects` (
   UNIQUE KEY `projects_project_code_unique` (`project_code`),
   KEY `project_manager_id` (`project_manager_id`),
   KEY `branch_id` (`branch_id`),
-  CONSTRAINT `projects_ibfk_73` FOREIGN KEY (`project_manager_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `projects_ibfk_74` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `projects_ibfk_77` FOREIGN KEY (`project_manager_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `projects_ibfk_78` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -822,8 +826,8 @@ CREATE TABLE `tasks` (
   UNIQUE KEY `tasks_task_code_unique` (`task_code`),
   KEY `project_id` (`project_id`),
   KEY `assigned_to` (`assigned_to`),
-  CONSTRAINT `tasks_ibfk_347` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `tasks_ibfk_348` FOREIGN KEY (`assigned_to`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `tasks_ibfk_351` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tasks_ibfk_352` FOREIGN KEY (`assigned_to`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -882,4 +886,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-10 13:13:06
+-- Dump completed on 2026-10-10 13:28:32

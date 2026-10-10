@@ -170,6 +170,27 @@ function Sidebar({ isOpen = false, onClose }) {
           <span>🏛️</span>
           <span>Corporate Head Office: Varanasi</span>
         </div>
+        <a
+          href="mailto:info@vaidimiconsulting.in"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.2rem 0.5rem',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '0.6875rem',
+            color: '#cbd5e1',
+            textDecoration: 'none',
+            fontWeight: '500',
+            marginTop: '0.15rem'
+          }}
+          title="Official Company Email"
+        >
+          <span>✉️</span>
+          <span>info@vaidimiconsulting.in</span>
+        </a>
       </div>
 
       {/* User Info Capsule */}

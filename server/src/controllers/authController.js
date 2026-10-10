@@ -62,7 +62,7 @@ async function login(req, res) {
     let user = null;
     let searchEmail = inputIdentifier.toLowerCase();
 
-    if (['admin', 'admin@company.com', 'admin@vaidimi.com', 'gargi', 'gargi.singh', 'gargi.singh@vaidimi.com'].includes(searchEmail)) {
+    if (['admin', 'admin@company.com', 'admin@vaidimi.com', 'info@vaidimiconsulting.in', 'gargi', 'gargi.singh', 'gargi.singh@vaidimi.com'].includes(searchEmail)) {
       const adminUserCheck = await User.findOne({ where: { role: ROLES.ADMIN } });
       if (adminUserCheck) searchEmail = adminUserCheck.email;
     } else if (['hr', 'hr@company.com', 'hr@vaidimi.com', 'vinit', 'vinit.kumar', 'vinit.kumar@vaidimi.com', 'vineet', 'vineet.kumar', 'vineet.kumar@vaidimi.com'].includes(searchEmail)) {

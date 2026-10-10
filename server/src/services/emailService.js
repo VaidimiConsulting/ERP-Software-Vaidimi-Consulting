@@ -58,58 +58,58 @@ function getBrandedEmailHtml({ title, preheader, bodyHtml, actionUrl, actionText
       <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
         <div style="max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
           
-          <!-- Corporate Header -->
-          <div style="background-color: #042f2e; padding: 24px 32px; border-bottom: 3px solid #0f766e;">
-            <div style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">
-              Vaidimi <span style="color: #2dd4bf;">Consulting</span>
-            </div>
-            <div style="color: #94a3b8; font-size: 12px; margin-top: 4px; letter-spacing: 0.03em;">
-              Guidance &bull; Growth &bull; Success &bull; Enterprise Portal
-            </div>
-          </div>
-
-          <!-- Email Content Body -->
-          <div style="padding: 32px;">
-            <h2 style="margin-top: 0; color: #0f172a; font-size: 20px; font-weight: 700; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
-              ${title}
-            </h2>
-            ${preheader ? `<p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">${preheader}</p>` : ''}
-            
-            <div style="font-size: 15px; line-height: 1.6; color: #334155;">
-              ${bodyHtml}
+            <!-- Corporate Header -->
+            <div style="background-color: #042f2e; padding: 24px 32px; border-bottom: 3px solid #0f766e;">
+              <div style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">
+                Vaidimi <span style="color: #2dd4bf;">Consulting</span>
+              </div>
+              <div style="color: #94a3b8; font-size: 12px; margin-top: 4px; letter-spacing: 0.03em;">
+                Guidance &bull; Growth &bull; Success &bull; info@vaidimiconsulting.in
+              </div>
             </div>
 
-            ${actionButton}
+            <!-- Email Content Body -->
+            <div style="padding: 32px;">
+              <h2 style="margin-top: 0; color: #0f172a; font-size: 20px; font-weight: 700; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">
+                ${title}
+              </h2>
+              ${preheader ? `<p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">${preheader}</p>` : ''}
+              
+              <div style="font-size: 15px; line-height: 1.6; color: #334155;">
+                ${bodyHtml}
+              </div>
+
+              ${actionButton}
+            </div>
+
+            <!-- Footer -->
+            <div style="background-color: #f8fafc; padding: 20px 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
+              <p style="margin: 0 0 6px 0;">This is an automated system notification from Vaidimi Consulting Management Suite (<a href="mailto:info@vaidimiconsulting.in" style="color: #0f766e; text-decoration: none;">info@vaidimiconsulting.in</a>).</p>
+              <p style="margin: 0; color: #94a3b8;">&copy; ${new Date().getFullYear()} Vaidimi Consulting. All rights reserved.</p>
+            </div>
+
           </div>
-
-          <!-- Footer -->
-          <div style="background-color: #f8fafc; padding: 20px 32px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center;">
-            <p style="margin: 0 0 6px 0;">This is an automated system notification from Vaidimi Consulting Management Suite.</p>
-            <p style="margin: 0; color: #94a3b8;">&copy; ${new Date().getFullYear()} Vaidimi Consulting. All rights reserved.</p>
-          </div>
-
-        </div>
-      </body>
-    </html>
-  `;
-}
-
-/**
- * Generic Send Email Method
- */
-async function sendEmail({ to, subject, html, text }) {
-  if (process.env.EMAIL_NOTIFICATIONS_ENABLED === 'false') {
-    return { success: false, message: 'Email notifications disabled in configuration.' };
+        </body>
+      </html>
+    `;
   }
 
-  if (!to) {
-    return { success: false, message: 'Recipient email address missing.' };
-  }
+  /**
+   * Generic Send Email Method
+   */
+  async function sendEmail({ to, subject, html, text }) {
+    if (process.env.EMAIL_NOTIFICATIONS_ENABLED === 'false') {
+      return { success: false, message: 'Email notifications disabled in configuration.' };
+    }
 
-  // If live transporter is configured and active
-  if (transporter) {
-    try {
-      const from = process.env.SMTP_FROM || `"Vaidimi Consulting" <${process.env.SMTP_USER}>`;
+    if (!to) {
+      return { success: false, message: 'Recipient email address missing.' };
+    }
+
+    // If live transporter is configured and active
+    if (transporter) {
+      try {
+        const from = process.env.SMTP_FROM || `"Vaidimi Consulting" <${process.env.SMTP_USER || 'info@vaidimiconsulting.in'}>`;
       const info = await transporter.sendMail({
         from,
         to,

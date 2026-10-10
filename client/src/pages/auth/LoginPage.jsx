@@ -135,7 +135,7 @@ function LoginPage() {
               </label>
               <input
                 type="text"
-                placeholder="name@company.com or EMP-001"
+                placeholder="info@vaidimiconsulting.in or EMP-001"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -229,7 +229,13 @@ function LoginPage() {
           color: 'var(--text-muted)',
           marginTop: '1.5rem'
         }}>
-          Vaidimi Consulting &bull; Secure Enterprise Portal
+          Vaidimi Consulting &bull; Secure Enterprise Portal &bull;{' '}
+          <a
+            href="mailto:info@vaidimiconsulting.in"
+            style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '600' }}
+          >
+            info@vaidimiconsulting.in
+          </a>
         </p>
       </div>
     </div>
