@@ -2,7 +2,8 @@ import axios from 'axios';
 
 function getApiBaseUrl() {
   if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes('localhost')) {
-    return import.meta.env.VITE_API_URL;
+    const rawUrl = import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '');
+    return rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
   }
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
