@@ -11,11 +11,6 @@ lerna-debug.log*
 node_modules/
 **/node_modules/
 
-# Production builds
-dist/
-dist-ssr/
-build/
-client/dist/
 
 # Environment files & Secrets
 .env
