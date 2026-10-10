@@ -1,0 +1,20 @@
+{
+  "name": "company-management-system",
+  "version": "1.0.0",
+  "description": "Company Employee, Leave, Attendance, and Project Management System",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install:all": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "nodejs",
+    "express",
+    "mysql",
+    "sequelize"
+  ],
+  "author": "",
+  "license": "ISC"
+}
