@@ -55,6 +55,9 @@ function ProtectedRoute({ children, allowedRoles }) {
     }
 
     if (user?.role === 'EMPLOYEE') {
+      const path = location.pathname;
+      if (path.startsWith('/admin/holidays') || path.startsWith('/hr/holidays')) return <Navigate to="/employee/holidays" replace />;
+      if (path.startsWith('/admin/calendar') || path.startsWith('/hr/calendar')) return <Navigate to="/employee/calendar" replace />;
       return <Navigate to="/employee/dashboard" replace />;
     }
 

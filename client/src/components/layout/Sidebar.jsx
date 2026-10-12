@@ -27,7 +27,7 @@ function Sidebar({ isOpen = false, onClose }) {
     { label: 'Leaves', path: '/admin/leaves', icon: '🏖️' },
     { label: 'Payroll & Salary', path: '/admin/payroll', icon: '💰' },
     { label: 'Corporate Calendar', path: '/admin/calendar', icon: '📅' },
-    { label: 'Holidays', path: '/admin/holidays', icon: '🎉' },
+    { label: 'Holidays & Festivals', path: '/admin/holidays', icon: '🎉' },
     { label: 'Reports', path: '/admin/reports', icon: '📈' },
     { label: 'Settings', path: '/admin/settings', icon: '⚙️' },
   ];
@@ -44,7 +44,7 @@ function Sidebar({ isOpen = false, onClose }) {
     { label: 'Leaves', path: '/hr/leaves', icon: '🏖️' },
     { label: 'My Salary', path: '/hr/salary', icon: '💰' },
     { label: 'Corporate Calendar', path: '/hr/calendar', icon: '📅' },
-    { label: 'Holidays', path: '/hr/holidays', icon: '🎉' },
+    { label: 'Holidays & Festivals', path: '/hr/holidays', icon: '🎉' },
     { label: 'Reports', path: '/hr/reports', icon: '📈' },
     { label: 'Settings', path: '/hr/settings', icon: '⚙️' },
   ];
@@ -61,6 +61,7 @@ function Sidebar({ isOpen = false, onClose }) {
     { label: 'My Leaves', path: '/employee/leaves', icon: '🏖️' },
     { label: 'My Salary', path: '/employee/salary', icon: '💰' },
     { label: 'Corporate Calendar', path: '/employee/calendar', icon: '📅' },
+    { label: 'Holidays & Festivals', path: '/employee/holidays', icon: '🎉' },
     { label: 'Settings', path: '/employee/settings', icon: '⚙️' },
   ];
 

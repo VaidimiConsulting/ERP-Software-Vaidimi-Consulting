@@ -158,7 +158,7 @@ function App() {
           <Route
             path="/admin/holidays"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <HolidaysPage />
               </ProtectedRoute>
             }
@@ -341,6 +341,24 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']}>
                 <CalendarPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Shared & Role-Specific Holiday & Festival Routes */}
+          <Route
+            path="/holidays"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']}>
+                <HolidaysPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/holidays"
+            element={
+              <ProtectedRoute allowedRoles={['EMPLOYEE', 'HR', 'MANAGER', 'ADMIN']}>
+                <HolidaysPage />
               </ProtectedRoute>
             }
           />
