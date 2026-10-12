@@ -204,10 +204,13 @@ function HolidaysPage() {
   }, [selectedYear, selectedMonth, holidaysByDate, todayStr]);
 
   const openCreateModal = (prefillDate = '') => {
+    const defaultDate = prefillDate || `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
     setModalMode('create');
     setFormData({
       name: '',
-      date: prefillDate || `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`,
+      date: defaultDate,
+      end_date: defaultDate,
+      is_range: false,
       is_paid: true,
       applicable_to: 'ALL',
       description: '',
@@ -220,6 +223,8 @@ function HolidaysPage() {
     setFormData({
       name: h.name,
       date: h.date,
+      end_date: h.date,
+      is_range: false,
       is_paid: h.is_paid,
       applicable_to: h.applicable_to,
       description: h.description || '',
@@ -232,7 +237,12 @@ function HolidaysPage() {
     setSubmitting(true);
     try {
       if (modalMode === 'create') {
-        await createHoliday(formData);
+        const payload = {
+          ...formData,
+          start_date: formData.date,
+          end_date: formData.is_range && formData.end_date ? formData.end_date : formData.date,
+        };
+        await createHoliday(payload);
       } else {
         await updateHoliday(currentHoliday.id, formData);
       }
@@ -1313,6 +1323,11 @@ function HolidaysPage() {
                 <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
                   Official Corporate Holiday Details
                 </div>
+                {detailHoliday.name.includes('(Day ') && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: '#065f46', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-sm)', fontSize: '0.72rem', fontWeight: '700', marginTop: '0.25rem' }}>
+                    <span>🗓️ Part of Multi-Day Festival Leave</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1447,25 +1462,166 @@ function HolidaysPage() {
                 />
               </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ fontSize: '0.8125rem', fontWeight: '600', display: 'block', marginBottom: '0.25rem' }}>
-                  Date (YYYY-MM-DD) *
-                </label>
-                <input
-                  type="date"
-                  className="input"
-                  min="1900-01-01"
-                  max="2199-12-31"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                />
-                {formData.date && (
-                  <div style={{ fontSize: '0.72rem', color: 'var(--primary)', marginTop: '0.25rem', fontWeight: '600' }}>
-                    🗓️ Day of week: {new Date(formData.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' })}
+              {/* Holiday Duration Type Toggle (Create Mode) */}
+              {modalMode === 'create' && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ fontSize: '0.8125rem', fontWeight: '600', display: 'block', marginBottom: '0.35rem' }}>
+                    Leave Duration Type
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, is_range: false, end_date: formData.date })}
+                      style={{
+                        padding: '0.5rem',
+                        fontSize: '0.8125rem',
+                        fontWeight: '600',
+                        borderRadius: 'var(--radius-md)',
+                        border: !formData.is_range ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                        backgroundColor: !formData.is_range ? 'rgba(16, 185, 129, 0.08)' : '#ffffff',
+                        color: !formData.is_range ? 'var(--primary)' : 'var(--text-muted)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      📅 Single Day Holiday
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextDay = new Date(formData.date + 'T00:00:00');
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        const nextDayStr = nextDay.toISOString().split('T')[0];
+                        setFormData({ ...formData, is_range: true, end_date: formData.end_date || nextDayStr });
+                      }}
+                      style={{
+                        padding: '0.5rem',
+                        fontSize: '0.8125rem',
+                        fontWeight: '600',
+                        borderRadius: 'var(--radius-md)',
+                        border: formData.is_range ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                        backgroundColor: formData.is_range ? 'rgba(16, 185, 129, 0.08)' : '#ffffff',
+                        color: formData.is_range ? 'var(--primary)' : 'var(--text-muted)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🗓️ Date to Date Multi-Day Leave
+                    </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              {/* Single Day Date Picker */}
+              {!formData.is_range ? (
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ fontSize: '0.8125rem', fontWeight: '600', display: 'block', marginBottom: '0.25rem' }}>
+                    Holiday Date (YYYY-MM-DD) *
+                  </label>
+                  <input
+                    type="date"
+                    className="input"
+                    min="1900-01-01"
+                    max="2199-12-31"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value, end_date: e.target.value })}
+                    required
+                  />
+                  {formData.date && (
+                    <div style={{ fontSize: '0.72rem', color: 'var(--primary)', marginTop: '0.25rem', fontWeight: '600' }}>
+                      🗓️ Day of week: {new Date(formData.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long' })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Date to Date Multi-Day Range Pickers */
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.8125rem', fontWeight: '600', display: 'block', marginBottom: '0.25rem' }}>
+                        Start Date (From) *
+                      </label>
+                      <input
+                        type="date"
+                        className="input"
+                        min="1900-01-01"
+                        max="2199-12-31"
+                        value={formData.date}
+                        onChange={(e) => {
+                          const newStart = e.target.value;
+                          const updates = { ...formData, date: newStart };
+                          if (formData.end_date < newStart) updates.end_date = newStart;
+                          setFormData(updates);
+                        }}
+                        required
+                      />
+                      {formData.date && (
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                          {new Date(formData.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short' })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.8125rem', fontWeight: '600', display: 'block', marginBottom: '0.25rem' }}>
+                        End Date (To) *
+                      </label>
+                      <input
+                        type="date"
+                        className="input"
+                        min={formData.date || '1900-01-01'}
+                        max="2199-12-31"
+                        value={formData.end_date}
+                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                        required
+                      />
+                      {formData.end_date && (
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                          {new Date(formData.end_date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short' })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Computed Duration Banner */}
+                  {formData.date && formData.end_date && (
+                    <div
+                      style={{
+                        marginTop: '0.6rem',
+                        padding: '0.6rem 0.75rem',
+                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        fontSize: '0.78rem',
+                        color: '#065f46',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}
+                    >
+                      <span style={{ fontSize: '1.1rem' }}>🎉</span>
+                      <div>
+                        <div>
+                          <strong>
+                            {Math.max(
+                              1,
+                              Math.round(
+                                (new Date(formData.end_date + 'T00:00:00') - new Date(formData.date + 'T00:00:00')) /
+                                  (1000 * 60 * 60 * 24)
+                              ) + 1
+                            )}{' '}
+                            Days Festival Leave
+                          </strong>{' '}
+                          ({new Date(formData.date + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} to{' '}
+                          {new Date(formData.end_date + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })})
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                          Each day will be individually marked and credited on the employee calendar.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
                 <div>

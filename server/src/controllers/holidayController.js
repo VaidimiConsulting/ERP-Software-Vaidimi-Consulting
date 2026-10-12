@@ -45,38 +45,94 @@ async function getHolidays(req, res) {
  */
 async function createHoliday(req, res) {
   try {
-    const { name, date, is_paid = true, applicable_to = 'ALL', description } = req.body;
-
-    if (!name || !date) {
-      return res.status(400).json({
-        success: false,
-        message: 'Holiday name and date are required.',
-      });
-    }
-
-    const year = new Date(date).getFullYear();
-
-    const existing = await Holiday.findOne({ where: { name: name.trim(), date } });
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: 'A holiday with this name and date already exists.',
-      });
-    }
-
-    const holiday = await Holiday.create({
-      name: name.trim(),
+    const {
+      name,
       date,
-      is_paid,
-      applicable_to,
-      description: description ? description.trim() : null,
-      year,
-    });
+      start_date,
+      end_date,
+      is_paid = true,
+      applicable_to = 'ALL',
+      description,
+    } = req.body;
+
+    const initialDate = start_date || date;
+    const finalDate = end_date || initialDate;
+
+    if (!name || !initialDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Holiday name and start date are required.',
+      });
+    }
+
+    const start = new Date(initialDate + 'T00:00:00');
+    const end = new Date(finalDate + 'T00:00:00');
+
+    if (end < start) {
+      return res.status(400).json({
+        success: false,
+        message: 'End date cannot be earlier than start date.',
+      });
+    }
+
+    const dayDiff = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+    // Safety limit: max 30 consecutive days
+    if (dayDiff > 30) {
+      return res.status(400).json({
+        success: false,
+        message: 'Holiday leave range cannot exceed 30 consecutive days.',
+      });
+    }
+
+    const createdRecords = [];
+    const cleanName = name.trim();
+
+    for (let i = 0; i < dayDiff; i++) {
+      const curDate = new Date(start);
+      curDate.setDate(curDate.getDate() + i);
+      const curDateStr = curDate.toISOString().split('T')[0];
+      const curYear = curDate.getFullYear();
+
+      const dayTitle =
+        dayDiff > 1
+          ? `${cleanName} (Day ${i + 1} of ${dayDiff})`
+          : cleanName;
+
+      const rangeNotice =
+        dayDiff > 1
+          ? `Festival Leave (${initialDate} to ${finalDate}, ${dayDiff} Days Off)`
+          : '';
+
+      const fullDesc = [rangeNotice, description ? description.trim() : '']
+        .filter(Boolean)
+        .join(' • ');
+
+      // Find or create for each day in range
+      const [holidayRecord] = await Holiday.findOrCreate({
+        where: { name: dayTitle, date: curDateStr },
+        defaults: {
+          name: dayTitle,
+          date: curDateStr,
+          is_paid: is_paid === true || is_paid === 'true',
+          applicable_to: applicable_to || 'ALL',
+          description: fullDesc || null,
+          year: curYear,
+        },
+      });
+
+      createdRecords.push(holidayRecord);
+    }
 
     return res.status(201).json({
       success: true,
-      message: 'Holiday created successfully.',
-      data: holiday,
+      message:
+        dayDiff > 1
+          ? `Multi-day festival leave '${cleanName}' (${dayDiff} days: ${initialDate} to ${finalDate}) registered successfully.`
+          : 'Holiday created successfully.',
+      count: createdRecords.length,
+      data: createdRecords[0],
+      records: createdRecords,
     });
   } catch (error) {
     return res.status(500).json({
