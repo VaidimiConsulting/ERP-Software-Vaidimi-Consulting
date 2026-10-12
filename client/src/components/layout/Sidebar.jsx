@@ -29,19 +29,27 @@ function Sidebar({ isOpen = false, onClose }) {
     { label: 'Corporate Calendar', path: '/admin/calendar', icon: '📅' },
     { label: 'Holidays', path: '/admin/holidays', icon: '🎉' },
     { label: 'Reports', path: '/admin/reports', icon: '📈' },
+    { label: 'Settings', path: '/admin/settings', icon: '⚙️' },
   ];
 
   const hrNav = [
     { label: 'HR Dashboard', path: '/hr/dashboard', icon: '📊' },
     { label: 'Company Chat', path: '/hr/chat', icon: '💬' },
+    { label: 'Branches', path: '/hr/branches', icon: '🏢' },
     { label: 'Employees', path: '/hr/employees', icon: '👥' },
     { label: 'Interns', path: '/hr/interns', icon: '🎓' },
+    { label: 'Projects', path: '/hr/projects', icon: '💼' },
+    { label: 'Tasks', path: '/hr/tasks', icon: '✅' },
     { label: 'Attendance', path: '/hr/attendance', icon: '⏱️' },
     { label: 'Leaves', path: '/hr/leaves', icon: '🏖️' },
+    { label: 'My Salary', path: '/hr/salary', icon: '💰' },
     { label: 'Corporate Calendar', path: '/hr/calendar', icon: '📅' },
     { label: 'Holidays', path: '/hr/holidays', icon: '🎉' },
-    { label: 'HR Reports', path: '/hr/reports', icon: '📈' },
+    { label: 'Reports', path: '/hr/reports', icon: '📈' },
+    { label: 'Settings', path: '/hr/settings', icon: '⚙️' },
   ];
+
+
 
   const employeeNav = [
     { label: 'Dashboard', path: '/employee/dashboard', icon: '📊' },
@@ -53,6 +61,7 @@ function Sidebar({ isOpen = false, onClose }) {
     { label: 'My Leaves', path: '/employee/leaves', icon: '🏖️' },
     { label: 'My Salary', path: '/employee/salary', icon: '💰' },
     { label: 'Corporate Calendar', path: '/employee/calendar', icon: '📅' },
+    { label: 'Settings', path: '/employee/settings', icon: '⚙️' },
   ];
 
   let navItems = employeeNav;
@@ -296,7 +305,8 @@ function Sidebar({ isOpen = false, onClose }) {
               style={({ isActive }) => {
                 const isCalendar = item.path.includes('calendar') && location.pathname.includes('calendar');
                 const isChat = item.path.includes('chat') && location.pathname.includes('chat');
-                const active = isActive || isCalendar || isChat;
+                const isSettings = item.path.includes('settings') && location.pathname.includes('settings');
+                const active = isActive || isCalendar || isChat || isSettings;
                 return {
                   display: 'flex',
                   alignItems: 'center',

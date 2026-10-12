@@ -14,6 +14,7 @@ const {
   Notification,
 } = require('../models');
 const { ROLES, EMPLOYMENT_TYPES, EMPLOYEE_STATUS } = require('../config/constants');
+const { notifyAdminsOnly } = require('../utils/notify');
 
 /**
  * Generate next unique employee or intern code
@@ -61,10 +62,7 @@ async function getEmployees(req, res) {
 
     const where = {};
 
-    // Branch scoping: If user is HR, automatically scope to their assigned branch
-    if (req.user?.role === ROLES.HR && req.user?.employeeProfile?.branch_id) {
-      where.branch_id = req.user.employeeProfile.branch_id;
-    } else if (branch_id) {
+    if (branch_id) {
       where.branch_id = Number(branch_id);
     }
 
@@ -123,13 +121,27 @@ async function getEmployees(req, res) {
         {
           model: User,
           as: 'user',
-          attributes: req.user?.role === ROLES.ADMIN
+          attributes: (req.user?.role === ROLES.ADMIN || req.user?.role === ROLES.HR)
             ? ['id', 'email', 'role', 'is_active', 'saved_password']
             : ['id', 'email', 'role', 'is_active'],
         },
       ],
       order: [['created_at', 'DESC']],
     });
+
+    // Confidentiality rule: ONLY Admin can view other employees' base salaries.
+    // For HR and Employees, they can ONLY see their own base salary, never anyone else's!
+    if (req.user?.role !== ROLES.ADMIN) {
+      employees.forEach((emp) => {
+        const isSelf = (req.employee && req.employee.id === emp.id) || (emp.user_id && emp.user_id === req.user.id);
+        if (!isSelf) {
+          if (emp.dataValues) {
+            delete emp.dataValues.base_salary;
+          }
+          emp.base_salary = undefined;
+        }
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -177,7 +189,7 @@ async function getEmployeeById(req, res) {
         {
           model: User,
           as: 'user',
-          attributes: req.user?.role === ROLES.ADMIN
+          attributes: (req.user?.role === ROLES.ADMIN || req.user?.role === ROLES.HR)
             ? ['id', 'email', 'role', 'is_active', 'saved_password']
             : ['id', 'email', 'role', 'is_active'],
         },
@@ -212,6 +224,15 @@ async function getEmployeeById(req, res) {
           status: employee.status,
         },
       });
+    }
+
+    // Confidentiality rule: ONLY Admin can view other employees' base salaries.
+    // Non-admin users (HR and Employees) can ONLY view their own base salary, never anyone else's!
+    if (req.user?.role !== ROLES.ADMIN && !isSelf) {
+      if (employee.dataValues) {
+        delete employee.dataValues.base_salary;
+      }
+      employee.base_salary = undefined;
     }
 
     return res.status(200).json({
@@ -368,12 +389,8 @@ async function createEmployee(req, res) {
       is_active: status === EMPLOYEE_STATUS.ACTIVE,
     });
 
-    // Create employee record
-    // Branch scoping for creation: If HR, default to HR's branch
-    let assignedBranchId = branch_id ? Number(branch_id) : null;
-    if (req.user?.role === ROLES.HR && req.user?.employeeProfile?.branch_id) {
-      assignedBranchId = req.user.employeeProfile.branch_id;
-    }
+    // Create employee record across any branch
+    const assignedBranchId = branch_id ? Number(branch_id) : null;
 
     const newEmployee = await Employee.create({
       user_id: newUser.id,
@@ -399,7 +416,7 @@ async function createEmployee(req, res) {
       college: college || null,
       course: course || null,
       mentor_id: mentor_id ? Number(mentor_id) : null,
-      base_salary: base_salary !== undefined && !isNaN(Number(base_salary)) ? Number(base_salary) : 30000.00,
+      base_salary: (req.user.role === ROLES.ADMIN && base_salary !== undefined && !isNaN(Number(base_salary))) ? Number(base_salary) : 30000.00,
       father_name: father_name || null,
       mother_name: mother_name || null,
       blood_group: blood_group || null,
@@ -428,6 +445,15 @@ async function createEmployee(req, res) {
         { model: User, as: 'user', attributes: ['id', 'email', 'role', 'is_active'] },
       ],
     });
+
+    if (req.user.role !== ROLES.ADMIN) {
+      if (fullEmployee && fullEmployee.dataValues) {
+        delete fullEmployee.dataValues.base_salary;
+      }
+      if (fullEmployee) {
+        fullEmployee.base_salary = undefined;
+      }
+    }
 
     return res.status(201).json({
       success: true,
@@ -529,6 +555,44 @@ async function updateEmployee(req, res) {
         }
       }
 
+      // Track updated fields to notify Admin
+      const updatedFields = [];
+      const fieldLabels = {
+        phone: 'Phone Number',
+        address: 'Residential Address',
+        emergency_contact: 'Emergency Contact',
+        skills: 'Skills',
+        profile_photo: 'Profile Photo',
+        allergies: 'Allergies',
+        medical_conditions: 'Medical Notes',
+        highest_qualification: 'Highest Qualification',
+        education_field: 'Education Stream',
+        college: 'College / University',
+        course: 'Degree / Course',
+        passing_year: 'Passing Year',
+        percentage_cgpa: 'Percentage / CGPA',
+        education_details: 'Education Details',
+      };
+
+      for (const [key, label] of Object.entries(fieldLabels)) {
+        let incomingVal = req.body[key];
+        if (key === 'phone' && cleanSelfPhone !== undefined) incomingVal = cleanSelfPhone;
+        if (key === 'emergency_contact' && cleanSelfEC !== undefined) incomingVal = cleanSelfEC;
+
+        if (incomingVal !== undefined) {
+          const oldStr = String(employee[key] || '').trim();
+          const newStr = String(incomingVal || '').trim();
+          if (oldStr !== newStr) {
+            updatedFields.push({
+              field: key,
+              label,
+              oldValue: oldStr || '(empty)',
+              newValue: newStr || '(cleared)',
+            });
+          }
+        }
+      }
+
       await employee.update({
         phone: cleanSelfPhone !== undefined ? cleanSelfPhone : employee.phone,
         address: req.body.address !== undefined ? req.body.address : employee.address,
@@ -545,6 +609,26 @@ async function updateEmployee(req, res) {
         percentage_cgpa: req.body.percentage_cgpa !== undefined ? req.body.percentage_cgpa : employee.percentage_cgpa,
         education_details: req.body.education_details !== undefined ? req.body.education_details : employee.education_details,
       });
+
+      // Dispatch detailed notification to Admin if employee changed any profile settings
+      if (updatedFields.length > 0) {
+        const changesSummary = updatedFields.map((f) => `${f.label}: "${f.newValue}"`).join('; ');
+        const notifyMsg = `Employee ${employee.first_name} ${employee.last_name} (${employee.employee_code}) updated their profile details: ${changesSummary}`;
+
+        await notifyAdminsOnly({
+          title: `Profile Update Alert: ${employee.first_name} ${employee.last_name} (${employee.employee_code})`,
+          message: notifyMsg,
+          type: 'PROFILE_UPDATE',
+          link: '/admin/settings?tab=audit',
+          details: {
+            employeeId: employee.id,
+            employeeName: `${employee.first_name} ${employee.last_name}`,
+            employeeCode: employee.employee_code,
+            changes: updatedFields,
+            updatedAt: new Date(),
+          },
+        });
+      }
 
       return res.status(200).json({
         success: true,
@@ -716,12 +800,19 @@ async function updateEmployee(req, res) {
         {
           model: User,
           as: 'user',
-          attributes: req.user?.role === ROLES.ADMIN
+          attributes: (req.user?.role === ROLES.ADMIN || req.user?.role === ROLES.HR)
             ? ['id', 'email', 'role', 'is_active', 'saved_password']
             : ['id', 'email', 'role', 'is_active'],
         },
       ],
     });
+
+    if (req.user?.role === ROLES.HR && updated) {
+      if (updated.dataValues) {
+        delete updated.dataValues.base_salary;
+      }
+      updated.base_salary = undefined;
+    }
 
     return res.status(200).json({
       success: true,

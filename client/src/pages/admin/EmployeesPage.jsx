@@ -11,6 +11,7 @@ import {
 import { getDepartments } from '../../services/departmentService';
 import { getBranches } from '../../services/branchService';
 import { exportToCsv, parseCsv, downloadSampleEmployeeCsv } from '../../utils/csvUtils';
+import { useAuth } from '../../context/AuthContext';
 
 export const CORPORATE_DESIGNATIONS = [
   'Director',
@@ -48,6 +49,8 @@ export const EDUCATION_FIELDS = [
 ];
 
 function EmployeesPage() {
+  const { user, isHR, isAdmin } = useAuth();
+  const isHROnly = isHR && !isAdmin;
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -398,8 +401,10 @@ function EmployeesPage() {
       sanitized.branch_id = sanitized.branch_id ? Number(sanitized.branch_id) : null;
       sanitized.reporting_manager_id = sanitized.reporting_manager_id ? Number(sanitized.reporting_manager_id) : null;
       sanitized.mentor_id = sanitized.mentor_id ? Number(sanitized.mentor_id) : null;
-      if (sanitized.base_salary !== undefined && sanitized.base_salary !== '') {
+      if (isAdmin && sanitized.base_salary !== undefined && sanitized.base_salary !== '') {
         sanitized.base_salary = Number(sanitized.base_salary);
+      } else {
+        delete sanitized.base_salary;
       }
       return sanitized;
     };
@@ -1729,20 +1734,22 @@ function EmployeesPage() {
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '600', marginBottom: '0.375rem' }}>
-                      Monthly Base Salary (₹)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="500"
-                      placeholder="30000"
-                      value={formData.base_salary}
-                      onChange={(e) => setFormData({ ...formData, base_salary: e.target.value })}
-                      style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: '#fff' }}
-                    />
-                  </div>
+                  {isAdmin && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '600', marginBottom: '0.375rem' }}>
+                        Monthly Base Salary (₹)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="500"
+                        placeholder="30000"
+                        value={formData.base_salary}
+                        onChange={(e) => setFormData({ ...formData, base_salary: e.target.value })}
+                        style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: '#fff' }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Joining Date & Status */}
@@ -2115,10 +2122,13 @@ function EmployeesPage() {
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Department</div>
                   <div style={{ fontWeight: '600', fontSize: '0.875rem' }}>{selectedEmployee.department?.department_name || 'None'}</div>
                 </div>
-                <div style={{ padding: '0.625rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Monthly Base Salary</div>
-                  <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#059669' }}>₹{Number(selectedEmployee.base_salary || 30000).toLocaleString('en-IN')}/mo</div>
-                </div>
+                {(isAdmin || (selectedEmployee && user?.employeeProfile && selectedEmployee.id === user.employeeProfile.id)) && (
+                  <div style={{ padding: '0.625rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)' }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Monthly Base Salary</div>
+                    <div style={{ fontWeight: '700', fontSize: '0.875rem', color: '#059669' }}>₹{Number(selectedEmployee.base_salary || 30000).toLocaleString('en-IN')}/mo</div>
+                  </div>
+                )}
+
                 <div style={{ padding: '0.625rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)' }}>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Joining Date</div>
                   <div style={{ fontWeight: '600', fontSize: '0.875rem' }}>{selectedEmployee.joining_date}</div>

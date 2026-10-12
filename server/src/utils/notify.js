@@ -100,6 +100,48 @@ async function notifyAdmins({ title, message, type = 'SYSTEM', link = null }) {
 }
 
 /**
+ * Notify ADMIN users exclusively (excludes HR & Manager)
+ * Used when employees update profile/settings or sensitive actions occur
+ */
+async function notifyAdminsOnly({ title, message, type = 'PROFILE_UPDATE', link = null, details = null }) {
+  try {
+    const adminUsers = await User.findAll({
+      where: {
+        role: ROLES.ADMIN,
+        is_active: true,
+      },
+    });
+
+    const notifications = adminUsers.map((user) => ({
+      user_id: user.id,
+      title,
+      message,
+      type,
+      link,
+      is_read: false,
+    }));
+
+    if (notifications.length > 0) {
+      const created = await Notification.bulkCreate(notifications);
+      // Real-time socket broadcast to each admin
+      adminUsers.forEach((admin, idx) => {
+        emitToUser(admin.id, 'new_notification', {
+          id: created[idx]?.id,
+          title,
+          message,
+          type,
+          link,
+          details,
+          created_at: new Date(),
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Failed to notify admins only:', error.message);
+  }
+}
+
+/**
  * Notify employee by employee ID (resolves user_id with email fallback)
  */
 async function notifyEmployee({ employeeId, title, message, type = 'SYSTEM', link = null }) {
@@ -132,5 +174,7 @@ async function notifyEmployee({ employeeId, title, message, type = 'SYSTEM', lin
 module.exports = {
   notifyUser,
   notifyAdmins,
+  notifyAdminsOnly,
   notifyEmployee,
 };
+

@@ -43,7 +43,7 @@ function ProtectedRoute({ children, allowedRoles }) {
       if (path.startsWith('/admin/interns')) return <Navigate to="/hr/interns" replace />;
       if (path.startsWith('/admin/attendance')) return <Navigate to="/hr/attendance" replace />;
       if (path.startsWith('/admin/leaves')) return <Navigate to="/hr/leaves" replace />;
-      if (path.startsWith('/admin/payroll')) return <Navigate to="/hr/payroll" replace />;
+      if (path.startsWith('/admin/payroll')) return <Navigate to="/hr/salary" replace />;
       if (path.startsWith('/admin/holidays')) return <Navigate to="/hr/holidays" replace />;
       if (path.startsWith('/admin/reports')) return <Navigate to="/hr/reports" replace />;
       if (path.startsWith('/admin/calendar')) return <Navigate to="/hr/calendar" replace />;

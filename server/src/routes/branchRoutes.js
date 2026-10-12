@@ -17,9 +17,10 @@ router.use(authenticate);
 router.get('/', getBranches);
 router.get('/:id', getBranchById);
 
-// Admin-only management
-router.post('/', authorizeRoles(ROLES.ADMIN), createBranch);
-router.put('/:id', authorizeRoles(ROLES.ADMIN), updateBranch);
-router.delete('/:id', authorizeRoles(ROLES.ADMIN), deleteBranch);
+// Admin and HR management
+router.post('/', authorizeRoles(ROLES.ADMIN, ROLES.HR), createBranch);
+router.put('/:id', authorizeRoles(ROLES.ADMIN, ROLES.HR), updateBranch);
+router.delete('/:id', authorizeRoles(ROLES.ADMIN, ROLES.HR), deleteBranch);
+
 
 module.exports = router;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout';
 import { useAuth } from '../../context/AuthContext';
 import { getEmployeeById, updateEmployee } from '../../services/employeeService';
@@ -63,7 +64,7 @@ function MyProfilePage() {
       });
 
       if (res.success) {
-        setFeedback({ success: true, message: 'Your personal contact details have been updated successfully!' });
+        setFeedback({ success: true, message: 'Your personal contact details have been updated and submitted to Administration.' });
         loadProfile();
       }
     } catch (err) {
@@ -293,7 +294,16 @@ function MyProfilePage() {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ fontSize: '1.125rem' }}>Personal Contact Information</h3>
-            <span className="badge badge-success">✏️ Self Service</span>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <span className="badge badge-success">✏️ Self Service</span>
+              <Link
+                to="/employee/settings"
+                className="btn btn-secondary"
+                style={{ padding: '0.25rem 0.65rem', fontSize: '0.75rem', textDecoration: 'none', fontWeight: '600' }}
+              >
+                ⚙️ Settings Hub
+              </Link>
+            </div>
           </div>
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
             You are authorized to maintain your contact numbers, address, and skills.

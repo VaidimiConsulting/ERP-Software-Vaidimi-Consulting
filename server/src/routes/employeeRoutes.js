@@ -25,8 +25,8 @@ router.post('/', authenticate, authorizeRoles(ROLES.ADMIN, ROLES.HR, ROLES.MANAG
 // Update employee (Admin full edit, Employee self-service for contact info)
 router.put('/:id', authenticate, updateEmployee);
 
-// Admin explicitly sets or resets password for employee or intern
-router.put('/:id/reset-password', authenticate, authorizeRoles(ROLES.ADMIN), resetEmployeePassword);
+// Admin and HR explicitly set or reset password for employee or intern
+router.put('/:id/reset-password', authenticate, authorizeRoles(ROLES.ADMIN, ROLES.HR), resetEmployeePassword);
 
 // Toggle active/inactive status (Admin and HR)
 router.put('/:id/toggle-status', authenticate, authorizeRoles(ROLES.ADMIN, ROLES.HR), toggleStatus);

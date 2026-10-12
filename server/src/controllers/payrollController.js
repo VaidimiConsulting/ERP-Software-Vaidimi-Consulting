@@ -400,7 +400,19 @@ async function updatePaymentStatus(req, res) {
  */
 async function getMyPayroll(req, res) {
   try {
-    if (!req.employee) {
+    let emp = req.employee;
+    if (!emp) {
+      emp = await Employee.findOne({
+        where: {
+          [Op.or]: [
+            { user_id: req.user.id },
+            { email: req.user.email },
+          ],
+        },
+      });
+    }
+
+    if (!emp) {
       return res.status(404).json({
         success: false,
         message: 'Employee profile not associated with this account.',
@@ -409,8 +421,9 @@ async function getMyPayroll(req, res) {
 
     const records = await Payroll.findAll({
       where: {
-        employee_id: req.employee.id,
+        employee_id: emp.id,
       },
+
       include: [
         {
           model: Employee,

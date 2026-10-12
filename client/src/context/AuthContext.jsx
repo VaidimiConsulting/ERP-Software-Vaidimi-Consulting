@@ -105,6 +105,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const res = await api.get('/auth/me');
+      if (res.data?.success) {
+        setUser(res.data.user);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        return res.data.user;
+      }
+    } catch (err) {
+      console.warn('Failed to refresh user:', err.message);
+    }
+    return null;
+  };
+
+  const updateUser = (newUserData) => {
+    if (!newUserData) return;
+    setUser((prev) => {
+      const updated = { ...prev, ...newUserData };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MANAGER';
   const isHR = user?.role === 'HR';
   const isAdminOrHR = isAdmin || isHR;
@@ -125,12 +148,15 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         changePassword,
+        refreshUser,
+        updateUser,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

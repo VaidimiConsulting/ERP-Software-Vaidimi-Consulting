@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import NotificationBell from '../notifications/NotificationBell';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
@@ -6,7 +7,8 @@ import ThemeToggle from '../common/ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
 
 function AppLayout({ children, pageTitle, subtitle }) {
-  const { user } = useAuth();
+  const { user, isAdmin, isHR } = useAuth();
+  const navigate = useNavigate();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -130,6 +132,31 @@ function AppLayout({ children, pageTitle, subtitle }) {
             {/* Notification Center */}
             <NotificationBell />
 
+            {/* Settings Quick Link */}
+            <button
+              type="button"
+              onClick={() => navigate(isAdmin ? '/admin/settings' : isHR ? '/hr/settings' : '/employee/settings')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.38rem 0.75rem',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '0.8125rem',
+                color: 'var(--text-main)',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all var(--transition-fast)',
+                whiteSpace: 'nowrap',
+              }}
+              title="System & Profile Settings"
+            >
+              <span>⚙️</span>
+              <span className="desktop-only">Settings</span>
+            </button>
+
             {/* Change Password Button (Desktop Only) */}
             <button
               type="button"
@@ -155,16 +182,22 @@ function AppLayout({ children, pageTitle, subtitle }) {
               <span>Password</span>
             </button>
 
-            {/* Executive Profile Badge */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.3rem 0.6rem 0.3rem 0.35rem',
-              backgroundColor: 'var(--primary-light)',
-              borderRadius: 'var(--radius-full)',
-              border: '1px solid rgba(15, 118, 110, 0.2)'
-            }}>
+            {/* Executive Profile Badge (Clickable to Settings) */}
+            <div
+              onClick={() => navigate(isAdmin ? '/admin/settings' : isHR ? '/hr/settings' : '/employee/settings')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.3rem 0.6rem 0.3rem 0.35rem',
+                backgroundColor: 'var(--primary-light)',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid rgba(15, 118, 110, 0.2)',
+                cursor: 'pointer',
+              }}
+              title="View & Edit Profile Settings"
+            >
+
               <div style={{
                 width: '28px',
                 height: '28px',

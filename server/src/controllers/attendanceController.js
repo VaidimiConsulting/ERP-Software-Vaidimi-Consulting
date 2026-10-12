@@ -435,12 +435,10 @@ async function getAllAttendance(req, res) {
       employeeWhere.department_id = department_id;
     }
 
-    // Branch scoping: If HR, restrict to their assigned branch
-    if (req.user?.role === ROLES.HR && req.user?.employeeProfile?.branch_id) {
-      employeeWhere.branch_id = req.user.employeeProfile.branch_id;
-    } else if (branch_id) {
+    if (branch_id) {
       employeeWhere.branch_id = Number(branch_id);
     }
+
 
     const employees = await Employee.findAll({
       where: employeeWhere,

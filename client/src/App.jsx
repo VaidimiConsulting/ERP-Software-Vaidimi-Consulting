@@ -30,6 +30,7 @@ import PayrollPage from './pages/admin/PayrollPage';
 import MySalaryPage from './pages/employee/MySalaryPage';
 import ChatPage from './pages/chat/ChatPage';
 import BranchesPage from './pages/admin/BranchesPage';
+import SettingsPage from './pages/shared/SettingsPage';
 
 // Styles
 import './styles/global.css';
@@ -85,7 +86,7 @@ function App() {
           <Route
             path="/admin/branches"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <BranchesPage />
               </ProtectedRoute>
             }
@@ -93,7 +94,7 @@ function App() {
           <Route
             path="/admin/employees"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <EmployeesPage />
               </ProtectedRoute>
             }
@@ -101,7 +102,7 @@ function App() {
           <Route
             path="/admin/interns"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <InternsPage />
               </ProtectedRoute>
             }
@@ -109,7 +110,7 @@ function App() {
           <Route
             path="/admin/projects"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <ProjectsPage />
               </ProtectedRoute>
             }
@@ -117,7 +118,7 @@ function App() {
           <Route
             path="/admin/projects/:id"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <ProjectDetailPage />
               </ProtectedRoute>
             }
@@ -125,7 +126,7 @@ function App() {
           <Route
             path="/admin/tasks"
             element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER']}>
                 <TasksPage />
               </ProtectedRoute>
             }
@@ -178,6 +179,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* HR Protected Routes */}
           <Route
@@ -185,6 +194,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
                 <HrDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/branches"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
+                <BranchesPage />
               </ProtectedRoute>
             }
           />
@@ -201,6 +218,30 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
                 <InternsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/projects"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
+                <ProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/projects/:id"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
+                <ProjectDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/tasks"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
+                <TasksPage />
               </ProtectedRoute>
             }
           />
@@ -252,6 +293,23 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/hr/settings"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER']}>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hr/salary"
+            element={
+              <ProtectedRoute allowedRoles={['HR', 'ADMIN', 'MANAGER', 'EMPLOYEE']}>
+                <MySalaryPage />
+              </ProtectedRoute>
+            }
+          />
+
 
           {/* Shared & Role-Specific Calendar Routes */}
           <Route
@@ -373,6 +431,22 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']}>
                 <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/employee/settings"
+            element={
+              <ProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER', 'HR', 'ADMIN']}>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']}>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />
